@@ -14,8 +14,8 @@
   register: mas_email_value
 
 - set_fact:
-    mas_email: mas_email_value
-    when: mas_email_value
+    mas_email: "{{ mas_email_value.user_input }}"
+  when: mas_email_value.user_input
 
 - pause:
     prompt: "Enter Mac App Store Password"
@@ -25,16 +25,16 @@
   no_log: true
 
 - set_fact:
-    mas_password: mas_password_value
-    when: mas_password_value
+    mas_password: "{{ mas_password_value.user_input }}"
+  when: mas_password_value.user_input
 
 - name: Sign in to MAS when email and password are provided.
   command: 'mas signin "{{ mas_email }}" "{{ mas_password }}"'
   register: mas_signin_result
   when:
     - mas_account_result.rc == 1
-    - mas_email
-    - mas_password
+    - mas_email is defined and mas_email != ''
+    - mas_password is defined and mas_password != ''
     - not mas_signin_dialog
 
 - name: Sign in to MAS when email is provided, and complete password and 2FA using dialog.
@@ -43,7 +43,7 @@
   when:
     - mas_signin_dialog
     - mas_account_result.rc == 1
-    - mas_email
+    - mas_email is defined and mas_email != ''
 
 - name: List installed MAS apps.
   command: mas list
