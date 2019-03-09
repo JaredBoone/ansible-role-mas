@@ -8,6 +8,26 @@
   failed_when: mas_account_result.rc > 1
   changed_when: false
 
+- pause:
+    prompt: "Enter Mac App Store Email"
+  when: mas_email == ''
+  register: mas_email_value
+
+- set_fact:
+    mas_email: mas_email_value
+    when: mas_email_value
+
+- pause:
+    prompt: "Enter Mac App Store Password"
+    echo: no
+  when: mas_password == ''
+  register: mas_password_value
+  no_log: true
+
+- set_fact:
+    mas_password: mas_password_value
+    when: mas_password_value
+
 - name: Sign in to MAS when email and password are provided.
   command: 'mas signin "{{ mas_email }}" "{{ mas_password }}"'
   register: mas_signin_result
